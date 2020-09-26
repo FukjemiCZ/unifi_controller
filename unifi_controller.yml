@@ -1,26 +1,30 @@
 ---
-- name: Install java and haveged
-  apt:
-    name: 
-    - openjdk-8-jre-headless
-    - haveged
-- name: Install unifi controller
-  apt_repository:
-    filename: "ubiquiti"
-    state: "present"
-    repo: "deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti"
-  become: yes
-  when: ansible_os_family == "Debian"
-- name: stop_mongodb
-  service:
-    name: mongodb
-    state: restarted
-- name: Disable service mongodb
-  service:
-    name: mongodb
-    enabled: no
-- name: Logs error unifi
-  lineinfile:
-    path: /var/lib/unifi/system.properties
-    regexp: '^log.inform='
-    line: 'log.inform=error'
+- name: unifi controller
+  hosts: unifi_servers
+  become: true
+  tasks:
+  - name: Install java and haveged
+    apt:
+      name: 
+      - openjdk-8-jre-headless
+      - haveged
+  - name: Install unifi controller
+    apt_repository:
+      filename: "ubiquiti"
+      state: "present"
+      repo: "deb http://www.ubnt.com/downloads/unifi/debian stable ubiquiti"
+    become: yes
+    when: ansible_os_family == "Debian"
+  - name: stop_mongodb
+    service:
+      name: mongodb
+      state: restarted
+  - name: Disable service mongodb
+    service:
+      name: mongodb
+      enabled: no
+  - name: Logs error unifi
+    lineinfile:
+      path: /var/lib/unifi/system.properties
+      regexp: '^log.inform='
+      line: 'log.inform=error'
